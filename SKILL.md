@@ -10,7 +10,8 @@ description: |
 
 OpenBird is a Node.js SDK for the Feishu (Lark) IM platform. It provides two channels:
 
-- **HTTP API (send)**: All outgoing actions — send messages, manage chats, search users, upload files, manage bots — go through `FeishuApi` class methods.
+- **HTTP API (send)**: All outgoing actions — send messages, manage chats, search users, upload files, manage bots, edit documents, manage calendar — go through `FeishuApi` class methods.
+- **Document Editor**: Stateful `DocxEditor` class for reading and editing Feishu documents (insert blocks, edit text, delete, move, change type).
 - **WebSocket (receive only)**: Server push events (incoming messages, reactions, read state, urgent notifications, calendar sync) are received via WebSocket and forwarded to your webhook URL.
 
 ## Decision Tree
@@ -35,6 +36,15 @@ What do you need?
 |
 +-- Schedule messages for future delivery
 |   -> Load: getting-started + api (see references/messaging.md)
+|
++-- Create / update / delete calendar events, book meeting rooms
+|   -> Load: getting-started + api (see references/calendar.md)
+|
++-- Read or edit Feishu documents (wiki / docx)
+|   -> Load: getting-started + api (see references/documents.md)
+|
++-- Look up Feishu Lingo (飞书词典) terms
+|   -> Load: getting-started + api (see references/reactions-threads-urgent.md)
 ```
 
 ## Skills Overview
@@ -42,7 +52,7 @@ What do you need?
 | Skill | What it covers |
 |-------|---------------|
 | `getting-started` | Install, authenticate, send your first message |
-| `api` | All 55 HTTP API methods organized by domain |
+| `api` | All 75+ HTTP API methods organized by domain |
 | `events` | WebSocket event types and webhook setup |
 | `recipes` | Complete runnable examples for common scenarios |
 | `gotchas` | Known pitfalls and edge cases |

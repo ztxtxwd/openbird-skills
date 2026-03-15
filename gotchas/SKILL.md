@@ -95,6 +95,69 @@ Use `Date.now() + offset` or `date.getTime()`. If you pass seconds, the SDK auto
 
 ---
 
+## Calendar
+
+### Calendar times are in seconds, not milliseconds
+
+Calendar API methods (`createCalendarEvent`, `updateCalendarEvent`, `webListCalendarEvents`, `getBusyUser`) use **Unix timestamps in seconds**. This is different from `putScheduleMessage` (which uses milliseconds).
+
+```javascript
+// WRONG: milliseconds for calendar
+await api.createCalendarEvent(auth, calendarId, {
+  summary: 'Meeting',
+  startTime: Date.now(),  // wrong — too large
+  endTime: Date.now() + 3600000,
+});
+
+// CORRECT: seconds for calendar
+await api.createCalendarEvent(auth, calendarId, {
+  summary: 'Meeting',
+  startTime: Math.floor(Date.now() / 1000),
+  endTime: Math.floor(Date.now() / 1000) + 3600,
+});
+```
+
+### eventKey vs eventId
+
+Calendar events have both a `key` (eventKey) and an `id` (eventId). Some methods use one, some use the other:
+- `calendarRsvp()`, `updateCalendarEvent()`, `deleteCalendarEvent()` use **eventId**
+- `createMeetingMinute()`, `transferCalendarEvent()`, `webShareCalendarEvent()` use **eventKey**
+
+### transferCalendarEvent uses userHashId, not userId
+
+The `targetUserHash` parameter for `transferCalendarEvent()` is a numeric hash ID, similar to `markSession()`.
+
+---
+
+## Documents
+
+### DocxEditor requires open() before any operation
+
+```javascript
+// WRONG: using editor without opening
+const editor = new DocxEditor(api, auth, origin, pageId);
+await editor.insertBlock(pageId, 0, 'text', { text: 'Hello' }); // throws!
+
+// CORRECT: open first
+const editor = new DocxEditor(api, auth, origin, pageId);
+await editor.open();
+await editor.insertBlock(pageId, 0, 'text', { text: 'Hello' });
+```
+
+### Wiki URLs need resolveWikiToken first
+
+For wiki documents (`/wiki/xxx`), you must call `resolveWikiToken()` to get the `objToken` before using `getDocxBlockTree()` or `DocxEditor`:
+
+```javascript
+const wiki = await api.resolveWikiToken(auth, origin, wikiToken);
+const objToken = wiki.data.objToken;
+// Now use objToken with getDocxBlockTree() or DocxEditor
+```
+
+For docx documents (`/docx/xxx`), the token in the URL is the `objToken` directly.
+
+---
+
 ## Events
 
 ### Always ACK webhook immediately
@@ -117,7 +180,7 @@ OpenBird uses multiple Feishu domains internally. You don't need to know these, 
 
 | Domain | Used for |
 |--------|----------|
-| `internal-api-lark-api.feishu.cn` | Main protobuf gateway (all 40+ API methods) |
+| `internal-api-lark-api.feishu.cn` | Main protobuf gateway (most API methods) |
 | `internal-api-lark-file.feishu.cn` | File/image upload |
 | `s1-imfile.feishucdn.com` | Image download (CDN) |
 | `open.feishu.cn` | Webhook bot management (JSON) |

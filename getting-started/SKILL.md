@@ -87,6 +87,7 @@ OPENBIRD_COOKIE="..." OPENBIRD_WEBHOOK_URL="http://localhost:3000/webhook" npx o
 ```javascript
 import FeishuAuth from 'openbird/core/auth.js';
 import FeishuApi from 'openbird/core/api.js';
+import DocxEditor from 'openbird/core/docx-editor.js'; // optional, for document editing
 
 const auth = new FeishuAuth();
 auth.prepareAuth(cookieString);

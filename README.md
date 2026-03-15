@@ -15,7 +15,7 @@ npx skills add https://github.com/ztxtxwd/openbird-skills
 | Skill | Description |
 |-------|-------------|
 | `getting-started` | Install, authenticate, send your first message |
-| `api` | All 55+ HTTP API methods (messaging, chats, users, bots, media, calendar) |
+| `api` | All 75+ HTTP API methods (messaging, chats, users, bots, media, calendar, documents) |
 | `events` | WebSocket push event types and webhook receiver setup |
 | `recipes` | Complete runnable examples (auto-reply bot, scheduled messages, webhook bot) |
 | `gotchas` | Known pitfalls and edge cases |
@@ -28,13 +28,15 @@ getting-started/SKILL.md              <- Quick start
 api/
   SKILL.md                            <- API method index
   references/
-    messaging.md                      <- Send text/file/image, @mention, reply, schedule
+    messaging.md                      <- Send text/file/image, @mention, reply, forward, schedule
     chat-management.md                <- Create group, pin, mark read
     history-search.md                 <- Chat history, search
     users.md                          <- User info, presence, contacts
-    reactions-calendar-threads.md     <- Reactions, calendar, threads, urgent
+    reactions-threads-urgent.md       <- Reactions, threads, urgent, Baike, config
+    calendar.md                       <- Calendar CRUD, meeting rooms, busy status
     media.md                          <- Upload/download images and files
     webhook-bots.md                   <- Webhook bot CRUD
+    documents.md                      <- Read/edit Feishu documents (wiki/docx)
 events/
   SKILL.md                            <- Event receiving overview
   references/

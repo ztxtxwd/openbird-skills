@@ -3,7 +3,8 @@ name: openbird-api
 description: |
   OpenBird HTTP API reference. Load when writing code that calls FeishuApi
   methods — sending messages, managing chats, querying users, uploading
-  files, managing bots, scheduling messages, or any Feishu operation.
+  files, managing bots, scheduling messages, editing documents, managing
+  calendar events, or any Feishu operation.
 ---
 
 # OpenBird API Reference
@@ -15,12 +16,18 @@ import FeishuApi from 'openbird/core/api.js';
 const api = new FeishuApi();
 ```
 
+For document editing, use the stateful `DocxEditor` wrapper:
+
+```javascript
+import DocxEditor from 'openbird/core/docx-editor.js';
+```
+
 ## Method Index
 
 ### What do you want to do?
 
 ```
-Send a message (text, file, image, @mention, reply)?
+Send a message (text, file, image, @mention, reply, forward)?
   -> references/messaging.md
 
 Schedule a message for later?
@@ -35,14 +42,20 @@ Get chat history or search messages?
 Look up user info, set signature, manage contacts?
   -> references/users.md
 
-Add emoji reactions, RSVP calendar, create threads, send urgent?
-  -> references/reactions-calendar-threads.md
+Add emoji reactions, create threads, send urgent, look up Baike terms?
+  -> references/reactions-threads-urgent.md
+
+Create / update / delete calendar events, RSVP, meeting rooms?
+  -> references/calendar.md
 
 Upload or download images/files?
   -> references/media.md
 
 Create or manage webhook bots?
   -> references/webhook-bots.md
+
+Read or edit Feishu documents (wiki / docx)?
+  -> references/documents.md
 ```
 
 ## Common Patterns

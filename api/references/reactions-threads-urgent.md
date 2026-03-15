@@ -1,4 +1,4 @@
-# Reactions, Calendar, Threads & Urgent API
+# Reactions, Threads, Urgent, Baike & More
 
 ## Emoji Reactions
 
@@ -18,46 +18,6 @@ await api.removeEmojiReaction(auth, messageId, emojiType)
 |-------|------|-------------|
 | `messageId` | string | Message ID (e.g. `'7604769001905884091'`) |
 | `emojiType` | string | Emoji type: `'THUMBSUP'`, `'SMILE'`, `'HEART'`, etc. |
-
----
-
-## Calendar
-
-### Get Calendar Events
-
-```javascript
-const result = await api.getCalendarEvents(auth, userId)
-// result: { success, events: [...] }
-```
-
-Each event contains:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `eventId` | string | UUID |
-| `title` | string | Event title |
-| `startTime` | number | Unix timestamp (seconds) |
-| `endTime` | number | Unix timestamp (seconds) |
-| `timezone` | string | e.g. `'Asia/Shanghai'` |
-| `attendees` | Array | `[{ name, userId, rsvpStatus, type }]` |
-| `rsvpStatus` | number | Current user's RSVP status |
-
-### RSVP to Calendar Event
-
-```javascript
-await api.calendarRsvp(auth, eventId, userId, rsvpStatus)
-```
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `eventId` | string | Calendar event ID (UUID) |
-| `userId` | string | Current user ID |
-| `rsvpStatus` | string or number | `'accept'`/`1`, `'decline'`/`2`, `'tentative'`/`3` |
-
-```javascript
-await api.calendarRsvp(auth, eventId, userId, 'accept');
-await api.calendarRsvp(auth, eventId, userId, 'decline');
-```
 
 ---
 
@@ -99,6 +59,54 @@ await api.pullUrgentAckStatus(auth, chatId, {
   urgentType?
 })
 ```
+
+---
+
+## Baike / Lingo (飞书词典)
+
+### Get Baike Card
+
+```javascript
+const result = await api.getBaikeCard(auth, entityId, text, options?)
+// result: { success, info: { term, fullName, definition, detailUrl, contributors } }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `entityId` | string | Baike entity ID |
+| `text` | string | Term text |
+| `options.entityType` | number? | Entity type (default: `1` = enterprise) |
+| `options.chatId` | string? | Chat context |
+| `options.messageId` | string? | Message context |
+
+Returns glossary card with definition, full name, contributors, and detail URL.
+
+### Get Baike Recommended Docs
+
+```javascript
+const result = await api.getBaikeRecommendDocs(auth, entityId, options?)
+// result: { success, entityId, docs }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `entityId` | string | Baike entity ID |
+| `options.entityType` | number? | Entity type (default: `1`) |
+
+---
+
+## Tenants
+
+### Get Tenant Info by IDs
+
+```javascript
+const result = await api.pullTenantsByIds(auth, tenantIds)
+// result: { success, data: { tenants } }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `tenantIds` | string[] | Tenant IDs to fetch |
 
 ---
 

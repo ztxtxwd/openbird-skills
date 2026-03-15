@@ -77,6 +77,21 @@ await api.sendReply(auth, text, chatId, { rootId, parentId })
 
 Both `rootId` and `parentId` are required. For a direct reply, they are the same.
 
+## Forward Message
+
+```javascript
+const result = await api.forwardMessage(auth, {
+  messageId: '7604769001905884091',
+  chatIds: ['7599271773103737795', '7600445044713098206']
+})
+// result: { success, messages, feedCards }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `params.messageId` | string | Message ID to forward |
+| `params.chatIds` | string[] | Chat IDs to forward to |
+
 ---
 
 ## Schedule Messages
