@@ -46,33 +46,24 @@ console.log('Signature:', sigResult.data);
 
 ## Sending Messages via Webhook Bot
 
-Once you have the webhook URL, send messages by POSTing JSON:
+Once you have the webhook URL, use the built-in send methods (no `auth` needed):
 
 ```javascript
-// Send a text message through the webhook bot
-await fetch(webhookUrl, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    msg_type: 'text',
-    content: { text: 'Build #42 passed!' }
-  })
+// Send a text message
+await api.sendWebhookBotText(webhookUrl, 'Build #42 passed!');
+
+// Send an interactive card
+await api.sendWebhookBotCard(webhookUrl, {
+  header: { title: { tag: 'plain_text', content: 'Build Result' } },
+  elements: [
+    { tag: 'markdown', content: '**Status**: Passed\n**Branch**: main' }
+  ]
 });
 
-// Send a rich text message
-await fetch(webhookUrl, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    msg_type: 'interactive',
-    card: {
-      header: { title: { tag: 'plain_text', content: 'Build Result' } },
-      elements: [
-        { tag: 'markdown', content: '**Status**: Passed\n**Branch**: main' }
-      ]
-    }
-  })
-});
+// Send with webhook signature verification
+const sigResult = await api.getSignature(auth, botId);
+const secret = sigResult.data.signature;
+await api.sendWebhookBotText(webhookUrl, 'Signed message', { secret });
 ```
 
 ## Managing the Bot

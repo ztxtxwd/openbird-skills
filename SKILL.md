@@ -28,7 +28,7 @@ What do you need?
 +-- Build a complete bot (send + receive)
 |   -> Load: getting-started + api + events + recipes
 |
-+-- Create / manage webhook bots
++-- Create / manage webhook bots, or send messages via webhook bot URL
 |   -> Load: getting-started + api (see references/webhook-bots.md)
 |
 +-- Upload images or files

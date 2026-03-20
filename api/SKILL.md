@@ -51,7 +51,7 @@ Create / update / delete calendar events, RSVP, meeting rooms?
 Upload or download images/files?
   -> references/media.md
 
-Create or manage webhook bots?
+Create or manage webhook bots, or send messages via webhook bot URL?
   -> references/webhook-bots.md
 
 Read or edit Feishu documents (wiki / docx)?

@@ -76,6 +76,75 @@ const result = await api.searchBots(auth, chatId, 'webhook')
 // result: { success, data: { bots, recommend_bots, sharable_bots } }
 ```
 
+## Send Messages via Webhook Bot
+
+These methods send messages directly to a webhook bot URL. They do **not** require `auth` — only the webhook URL.
+
+All send methods accept an optional `options` object for webhook signature:
+- `{ secret }` — auto-generates `timestamp` and `sign` using HMAC-SHA256
+- `{ timestamp, sign }` — use an explicit pre-computed signature
+- omit — send unsigned
+
+### Send Text
+
+```javascript
+const result = await api.sendWebhookBotText(webhookUrl, 'Build #42 passed!');
+// result: { success, data? }
+
+// With signature:
+const result = await api.sendWebhookBotText(webhookUrl, 'Hello', { secret: 'my-secret' });
+```
+
+### Send Post (Rich Text)
+
+```javascript
+const result = await api.sendWebhookBotPost(webhookUrl, {
+  zh_cn: {
+    title: 'Build Result',
+    content: [[{ tag: 'text', text: 'Status: Passed' }]]
+  }
+});
+```
+
+### Send Image
+
+```javascript
+const result = await api.sendWebhookBotImage(webhookUrl, 'img_v3_xxxx');
+```
+
+### Send Share Chat
+
+```javascript
+const result = await api.sendWebhookBotShareChat(webhookUrl, chatId);
+```
+
+### Send Interactive Card
+
+```javascript
+const result = await api.sendWebhookBotCard(webhookUrl, {
+  header: { title: { tag: 'plain_text', content: 'Notification' } },
+  elements: [
+    { tag: 'markdown', content: '**Status**: Passed\n**Branch**: main' }
+  ]
+});
+```
+
+### Send Raw Payload
+
+```javascript
+const result = await api.sendWebhookBotMessage(webhookUrl, {
+  msg_type: 'text',
+  content: { text: 'Hello' }
+}, { secret: 'my-secret' });
+```
+
+### Build Signature (Low-Level)
+
+```javascript
+const { timestamp, sign } = api.buildWebhookBotSignature(secret);
+// Use with explicit timestamp/sign options or manual requests
+```
+
 ## Complete Webhook Bot Setup Flow
 
 ```javascript
@@ -88,10 +157,12 @@ const botId = createResult.data.bot_id;
 // 2. Get the webhook URL
 const infoResult = await api.getWebhookBotInfo(auth, botId);
 const webhookUrl = infoResult.data.webhook;
-console.log('Webhook URL:', webhookUrl);
 
-// 3. (Optional) Get signature for webhook verification
+// 3. Send a message through the bot
+await api.sendWebhookBotText(webhookUrl, 'Bot is live!');
+
+// 4. (Optional) Send signed messages
 const sigResult = await api.getSignature(auth, botId);
-
-// Now POST JSON to webhookUrl to send messages through the bot
+const secret = sigResult.data.signature;
+await api.sendWebhookBotText(webhookUrl, 'Signed message', { secret });
 ```
