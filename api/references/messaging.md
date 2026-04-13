@@ -24,10 +24,10 @@ await api.sendFileMessage(auth, fileKey, chatId)
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `fileKey` | string | File key from `uploadFile()` (e.g. `'file_v3_00ve_...'`) |
+| `fileKey` | string | File key from `uploadFile()` |
 | `chatId` | string | Chat ID |
 
-You must upload the file first with `api.uploadFile()`, then send the returned key.
+Upload first with `api.uploadFile()`, then send the returned key.
 
 ## Send Image Message
 
@@ -37,10 +37,10 @@ await api.sendImageMessage(auth, imageKey, chatId)
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `imageKey` | string | Image key from `uploadImage()` (e.g. `'img_v3_02vf_...'`) |
+| `imageKey` | string | Image key from `uploadImage()` |
 | `chatId` | string | Chat ID |
 
-You must upload the image first with `api.uploadImage()`, then send the returned key.
+Upload first with `api.uploadImage()`, then send the returned key.
 
 ## Send Message with @Mentions
 
@@ -56,12 +56,6 @@ await api.sendMentionMessage(auth, text, chatId, mentions)
 
 The `@displayName` in the text must match the `displayName` in the mentions array.
 
-```javascript
-await api.sendMentionMessage(auth, 'Hey @Alice please review', chatId, [
-  { userId: '7441015090323947523', displayName: 'Alice' }
-]);
-```
-
 ## Send Reply
 
 ```javascript
@@ -75,7 +69,7 @@ await api.sendReply(auth, text, chatId, { rootId, parentId })
 | `rootId` | string | Root message ID of the thread |
 | `parentId` | string | Message ID being replied to |
 
-Both `rootId` and `parentId` are required. For a direct reply, they are the same.
+Both `rootId` and `parentId` are required. For a direct reply, they are usually the same.
 
 ## Forward Message
 
@@ -87,14 +81,44 @@ const result = await api.forwardMessage(auth, {
 // result: { success, messages, feedCards }
 ```
 
+## Message Links
+
+Current OpenBird also exposes message-link capabilities, both as low-level APIs and as MCP tools `put_message_link` and `get_message_link_permission`.
+
+### Create Message Link
+
+```javascript
+const result = await api.putMessageLink(auth, fromId, options?)
+// result: { success, token?, tokenUrl?, error? }
+```
+
 | Param | Type | Description |
 |-------|------|-------------|
-| `params.messageId` | string | Message ID to forward |
-| `params.chatIds` | string[] | Chat IDs to forward to |
+| `fromId` | string \| number \| bigint | Source entity ID |
+| `options.from` | string \| number? | Source type/context |
+| `options.copiedIds` | Array? | Message IDs to include in the link |
 
----
+Use this to generate a Feishu message link for a chat, thread, or message-thread context.
 
-## Schedule Messages
+### Check Message Link Permission
+
+```javascript
+const result = await api.getMessageLinkPermission(auth, token)
+// result: { success, permission?, permissionName?, applinkUrl?, error? }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `token` | string | Message link token |
+
+## MCP tool names
+
+Current OpenBird MCP tool names in this area are:
+- `send_message`
+- `send_mention_message`
+- `send_reply`
+- `put_message_link`
+- `get_message_link_permission`
 
 ### Create Scheduled Message
 
@@ -112,8 +136,7 @@ await api.putScheduleMessage(auth, text, chatId, scheduleTime, options?)
 Returns `{ success, scheduleMessage? }`.
 
 ```javascript
-// Schedule 1 hour from now
-await api.putScheduleMessage(auth, 'Reminder!', chatId, Date.now() + 3600000);
+await api.putScheduleMessage(auth, 'Reminder!', chatId, Date.now() + 3600000)
 ```
 
 ### Update/Delete Scheduled Message
@@ -131,24 +154,10 @@ await api.patchScheduleMessage(auth, chatId, messageId, patchType, options?)
 | `options.content` | string? | New content (for UPDATE) |
 | `options.sendImmediately` | boolean? | Send now (for UPDATE) |
 
-```javascript
-// Delete a scheduled message
-await api.patchScheduleMessage(auth, chatId, msgId, 3);
-
-// Send immediately
-await api.patchScheduleMessage(auth, chatId, msgId, 1, { sendImmediately: true });
-
-// Reschedule
-await api.patchScheduleMessage(auth, chatId, msgId, 1, { scheduleTime: Date.now() + 7200000 });
-```
-
 ### Query Scheduled Messages
 
 ```javascript
-// By specific IDs
 await api.pullScheduleMessageByIds(auth, chatId, ['sm_123', 'sm_456'])
-
-// All pending/suspended in a chat
 await api.pullChatScheduleMessages(auth, chatId, options?)
 ```
 
@@ -156,6 +165,6 @@ await api.pullChatScheduleMessages(auth, chatId, options?)
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `options.entityType` | number? | `1` = CHAT_ONLY (default), `2` = THREAD_ONLY |
+| `options.entityType` | number? | `1` = CHAT_ONLY, `2` = THREAD_ONLY |
 | `options.entityId` | string? | Entity ID (defaults to chatId) |
-| `options.status` | number[]? | Filter: `[1]` = PENDING, `[2]` = SUSPEND, default `[1, 2]` |
+| `options.status` | number[]? | Filter statuses, default `[1, 2]` |

@@ -17,7 +17,7 @@ Returns:
 | `userType` | number | `1` = user, `2` = bot |
 | `avatarKey` | string | Avatar image key |
 
-Works for both regular users and bots. This is the **recommended** method for looking up users.
+Works for both regular users and bots. This is the recommended method for looking up users. Current MCP tools in this area include `get_user_info`, `get_user_profile_card`, `set_user_signature`, and `get_user_relation`.
 
 ## Get User Profile Card
 
@@ -25,19 +25,9 @@ Works for both regular users and bots. This is the **recommended** method for lo
 const result = await api.getUserProfileCard(auth, userId)
 ```
 
-Returns profile card data: description/signature, display name, avatar key, profile field policies.
+Returns profile card data such as signature/description, display name, avatar key, and profile field policies.
 
 **Note**: `userId` must be a 15-20 digit numeric string.
-
-## Get User by ID (deprecated)
-
-```javascript
-const result = await api.getUserById(auth, userId)
-```
-
-**Deprecated** — use `getUserInfoById` instead. This only works for regular users, not bots.
-
-Returns: `{ success, data: { userId, name, enName, avatarUrl, avatarKey } }`
 
 ## Set User Signature
 
@@ -50,7 +40,7 @@ const result = await api.setUserSignature(auth, description, options?)
 | `description` | string | Signature text |
 | `options.descriptionFlag` | number? | Signature flag (default: 0) |
 
-Sets the current authenticated user's profile signature.
+Sets the current authenticated user's profile signature. Current MCP tool: `set_user_signature`.
 
 ## Get User Presence
 
@@ -71,7 +61,7 @@ const result = await api.getUserRelation(auth, userHashId)
 |-------|------|-------------|
 | `userHashId` | number | Target user hash ID (numeric, not string) |
 
-**Note**: Takes `userHashId` (a number), not `userId` (a string).
+**Note**: Takes `userHashId`, not `userId`. Current MCP tool: `get_user_relation`.
 
 ## Save Contact Alias
 
@@ -86,19 +76,18 @@ await api.saveContactAlias(auth, userId, { alias?, memo?, memoImageKey? })
 | `memo` | string? | Memo/note text |
 | `memoImageKey` | string? | Image key for memo |
 
-```javascript
-await api.saveContactAlias(auth, '7441015090323947523', { alias: 'Tom' });
-await api.saveContactAlias(auth, '7441015090323947523', { memo: 'Met at conference' });
-```
-
 ## Sync Contact Info
 
 ```javascript
 await api.syncContactInfo(auth, userId)
 ```
 
-Call after `saveContactAlias()` to sync updated contact data. This is part of the standard flow:
+Call after `saveContactAlias()` to sync updated contact data.
 
-1. `saveContactAlias()` — save alias
-2. `getUserInfoById()` — refresh user data
-3. `syncContactInfo()` — sync to server
+## Deprecated User Lookup
+
+```javascript
+const result = await api.getUserById(auth, userId)
+```
+
+Deprecated — prefer `getUserInfoById()` because it works for both regular users and bots.

@@ -87,6 +87,29 @@ Chat-level read position updated.
 
 Thread reply count changed.
 
+Current OpenBird behavior has one notable special case: `im.thread.reply_count_v1` may include a top-level `semantic` object that describes routing / dedupe semantics for the signal.
+
+```json
+{
+  "type": "im.thread.reply_count_v1",
+  "event_id": "evt_123",
+  "timestamp": 1712023530000,
+  "semantic": {
+    "entity": "thread",
+    "action": "activity_detected",
+    "kind": "state_signal"
+  },
+  "data": {
+    "chatId": "chat_1",
+    "threadId": "thread_1",
+    "replyCount": 12,
+    "updateTime": 1712023530000
+  }
+}
+```
+
+Do **not** assume other event types also include `semantic` — in current OpenBird, this is the exception, not the rule.
+
 ## im.message.urgent_v1 (Urgent)
 
 Someone sent an urgent notification.

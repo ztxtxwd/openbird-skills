@@ -1,14 +1,14 @@
 ---
 name: openbird-events
 description: |
-  OpenBird WebSocket event handling. Load when writing code to receive
+  OpenBird Relay-mode event handling. Load when writing code to receive
   Feishu push events — incoming messages, reactions, read state, urgent
-  notifications, calendar sync, or any server-side event.
+  notifications, calendar sync, or any server-side event forwarded by OpenBird.
 ---
 
 # Receiving Events
 
-OpenBird receives server push events via WebSocket and forwards them to your webhook URL as HTTP POST requests.
+In **Relay mode**, OpenBird receives server push events via WebSocket, normalizes them, and forwards them to your webhook URL as HTTP POST requests.
 
 ## How It Works
 
@@ -16,16 +16,16 @@ OpenBird receives server push events via WebSocket and forwards them to your web
 Feishu Server
   | (WebSocket push)
   v
-OpenBird (normalizer)
+OpenBird Relay
   | (HTTP POST, JSON body)
   v
 Your webhook endpoint
 ```
 
-Set `OPENBIRD_WEBHOOK_URL` to enable event forwarding:
+Run OpenBird in Relay mode:
 
 ```bash
-OPENBIRD_COOKIE="..." OPENBIRD_WEBHOOK_URL="http://localhost:3000/webhook" npx openbird
+OPENBIRD_COOKIE="..." npx openbird relay http://localhost:3000/webhook
 ```
 
 ## Event Format

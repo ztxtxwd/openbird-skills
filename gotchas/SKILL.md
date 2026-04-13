@@ -7,6 +7,21 @@ description: |
 
 # Gotchas & Pitfalls
 
+## Modes
+
+### OpenBird now uses explicit modes
+
+Older docs used `OPENBIRD_WEBHOOK_URL` to implicitly decide whether webhook forwarding was enabled. Current OpenBird uses explicit commands instead:
+
+```bash
+npx openbird mcp
+npx openbird relay http://localhost:3000/webhook
+```
+
+Relay mode does not start the MCP server, and MCP mode does not forward webhook events.
+
+---
+
 ## Auth
 
 ### FeishuAuth constructor takes NO arguments
@@ -22,18 +37,16 @@ auth.prepareAuth(cookieStr);
 
 ### Must bootstrap before using API
 
-After creating auth and api, you MUST call `getCsrfToken` and `getUserInfo`:
+After creating auth and api, you must call `getCsrfToken` and `getUserInfo`:
 
 ```javascript
 const { xCsrfToken } = await api.getCsrfToken(auth);
 const { userId } = await api.getUserInfo(auth, xCsrfToken);
 ```
 
-Without this, API calls will fail silently or return auth errors.
-
 ### Cookies expire
 
-Feishu cookies have a limited lifetime. If API calls start failing with HTTP 401 or empty responses, the cookie has expired. Get a fresh one from the Feishu web client.
+If API calls start failing with HTTP 401 or empty responses, the cookie has likely expired.
 
 ---
 
@@ -41,11 +54,11 @@ Feishu cookies have a limited lifetime. If API calls start failing with HTTP 401
 
 ### chatId vs encryptedChatId
 
-Most methods use `chatId` (19-digit numeric string like `'7599271773103737795'`). But `markChatRead()` uses `encryptedChatId` (a base64-like string like `'XISwqtc1G8VCEtA6iEwynw'`). Don't mix them up.
+Most methods use `chatId`. But `markChatRead()` uses `encryptedChatId`. Don't mix them up.
 
 ### userId vs userHashId
 
-Most methods use `userId` (string). But `markSession()`, `unmarkSession()`, and `getUserRelation()` use `userHashId` (a number, e.g. `2079738859`). These are different representations of the same user.
+Most methods use `userId`. But `markSession()`, `unmarkSession()`, and `getUserRelation()` use `userHashId` (numeric).
 
 ---
 
@@ -53,45 +66,19 @@ Most methods use `userId` (string). But `markSession()`, `unmarkSession()`, and 
 
 ### sendMessage returns raw buffer, not parsed JSON
 
-`sendMessage`, `sendFileMessage`, `sendImageMessage`, `sendMentionMessage`, and `sendReply` return `{ data: Buffer, status: number }`, not `{ success, data }`. The buffer is a raw protobuf response.
-
-Most other methods return `{ success: boolean, data?, error? }`.
+`sendMessage`, `sendFileMessage`, `sendImageMessage`, `sendMentionMessage`, and `sendReply` return `{ data: Buffer, status: number }`, not `{ success, data }`.
 
 ### Must upload before sending files/images
 
-You can't send a file/image directly. You must:
-1. `uploadImage()` or `uploadFile()` first to get a key
-2. Then `sendImageMessage(key)` or `sendFileMessage(key)`
+Upload first, then send using the returned key.
 
 ### @mention displayName must match text
 
-In `sendMentionMessage()`, the `displayName` in the mentions array must exactly match the `@displayName` pattern in the text:
-
-```javascript
-// WRONG: text says @Alice but mention says Bob
-api.sendMentionMessage(auth, 'Hi @Alice', chatId, [
-  { userId: '123', displayName: 'Bob' }
-]);
-
-// CORRECT: text and displayName match
-api.sendMentionMessage(auth, 'Hi @Alice', chatId, [
-  { userId: '123', displayName: 'Alice' }
-]);
-```
-
----
-
-## Scheduled Messages
+In `sendMentionMessage()`, the mention display name must exactly match the `@displayName` text fragment.
 
 ### scheduleTime is in milliseconds
 
-Use `Date.now() + offset` or `date.getTime()`. If you pass seconds, the SDK auto-detects and converts, but prefer milliseconds to be explicit.
-
-### patchType numbers
-
-- `1` = UPDATE (change time/content, or send immediately)
-- `2` = SUSPEND
-- `3` = DELETE
+Scheduled message APIs use milliseconds.
 
 ---
 
@@ -99,33 +86,17 @@ Use `Date.now() + offset` or `date.getTime()`. If you pass seconds, the SDK auto
 
 ### Calendar times are in seconds, not milliseconds
 
-Calendar API methods (`createCalendarEvent`, `updateCalendarEvent`, `webListCalendarEvents`, `getBusyUser`) use **Unix timestamps in seconds**. This is different from `putScheduleMessage` (which uses milliseconds).
-
-```javascript
-// WRONG: milliseconds for calendar
-await api.createCalendarEvent(auth, calendarId, {
-  summary: 'Meeting',
-  startTime: Date.now(),  // wrong — too large
-  endTime: Date.now() + 3600000,
-});
-
-// CORRECT: seconds for calendar
-await api.createCalendarEvent(auth, calendarId, {
-  summary: 'Meeting',
-  startTime: Math.floor(Date.now() / 1000),
-  endTime: Math.floor(Date.now() / 1000) + 3600,
-});
-```
+Calendar APIs like `createCalendarEvent`, `updateCalendarEvent`, `webListCalendarEvents`, and `getBusyUser` use Unix seconds.
 
 ### eventKey vs eventId
 
-Calendar events have both a `key` (eventKey) and an `id` (eventId). Some methods use one, some use the other:
+Calendar events have both:
 - `calendarRsvp()`, `updateCalendarEvent()`, `deleteCalendarEvent()` use **eventId**
 - `createMeetingMinute()`, `transferCalendarEvent()`, `webShareCalendarEvent()` use **eventKey**
 
 ### transferCalendarEvent uses userHashId, not userId
 
-The `targetUserHash` parameter for `transferCalendarEvent()` is a numeric hash ID, similar to `markSession()`.
+`targetUserHash` is numeric.
 
 ---
 
@@ -133,28 +104,17 @@ The `targetUserHash` parameter for `transferCalendarEvent()` is a numeric hash I
 
 ### DocxEditor requires open() before any operation
 
-```javascript
-// WRONG: using editor without opening
-const editor = new DocxEditor(api, auth, origin, pageId);
-await editor.insertBlock(pageId, 0, 'text', { text: 'Hello' }); // throws!
-
-// CORRECT: open first
-const editor = new DocxEditor(api, auth, origin, pageId);
-await editor.open();
-await editor.insertBlock(pageId, 0, 'text', { text: 'Hello' });
-```
+Call `editor.open()` before insert/edit/delete/move operations.
 
 ### Wiki URLs need resolveWikiToken first
 
-For wiki documents (`/wiki/xxx`), you must call `resolveWikiToken()` to get the `objToken` before using `getDocxBlockTree()` or `DocxEditor`:
+For `/wiki/...`, resolve the wiki token first to get `objToken`.
 
-```javascript
-const wiki = await api.resolveWikiToken(auth, origin, wikiToken);
-const objToken = wiki.data.objToken;
-// Now use objToken with getDocxBlockTree() or DocxEditor
-```
+For `/docx/...`, the URL token is already the `objToken`.
 
-For docx documents (`/docx/xxx`), the token in the URL is the `objToken` directly.
+### MCP document tools only support docx wiki objects
+
+Current MCP document helpers accept `/wiki/` and `/docx/` URLs, but wiki objects must resolve to object type `22`.
 
 ---
 
@@ -162,27 +122,31 @@ For docx documents (`/docx/xxx`), the token in the URL is the `objToken` directl
 
 ### Always ACK webhook immediately
 
-Respond HTTP 200 before processing the event. OpenBird retries with exponential backoff (500ms -> 8s, 5 attempts) if it doesn't get a 200.
+Respond HTTP 200 before processing. OpenBird retries with exponential backoff if it does not receive a 2xx response.
 
 ### Deduplicate by event_id
 
-The same event may be delivered more than once. Always check `event.event_id` before processing.
+The same event may be delivered more than once.
 
-### Skip own messages
+### Skip own messages and bot messages
 
-When building a reply bot, filter out messages from your own `userId` to avoid infinite loops. Also filter `sender.type === 'bot'`.
+When building reply bots, filter out your own user ID and `sender.type === 'bot'`.
+
+### Only `im.thread.reply_count_v1` currently carries `semantic`
+
+Do not assume every event type includes a top-level `semantic` object.
 
 ---
 
 ## API Domains
 
-OpenBird uses multiple Feishu domains internally. You don't need to know these, but for debugging:
+OpenBird uses multiple Feishu domains internally. For debugging:
 
 | Domain | Used for |
 |--------|----------|
-| `internal-api-lark-api.feishu.cn` | Main protobuf gateway (most API methods) |
+| `internal-api-lark-api.feishu.cn` | Main protobuf gateway |
 | `internal-api-lark-file.feishu.cn` | File/image upload |
-| `s1-imfile.feishucdn.com` | Image download (CDN) |
-| `open.feishu.cn` | Webhook bot management (JSON) |
+| `s1-imfile.feishucdn.com` | Image download |
+| `open.feishu.cn` | Webhook bot management |
 | `internal-api.feishu.cn` | Bot search |
 | `msg-frontier.feishu.cn` | WebSocket connection |

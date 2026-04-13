@@ -1,6 +1,6 @@
 # Recipe: Auto-Reply Bot
 
-A complete example that receives messages via webhook and auto-replies using the OpenBird SDK.
+A complete example that receives messages via OpenBird Relay and auto-replies using the OpenBird SDK.
 
 ## Architecture
 
@@ -8,7 +8,7 @@ A complete example that receives messages via webhook and auto-replies using the
 Feishu
   | (WebSocket push)
   v
-OpenBird (npx openbird)
+OpenBird Relay
   | (HTTP POST)
   v
 Your webhook server (this code)
@@ -25,12 +25,13 @@ pnpm init
 pnpm add openbird openbird-webhook-node express
 ```
 
-## .env
+## Environment
 
-```
+```bash
 OPENBIRD_COOKIE=your_cookie_string_here
-OPENBIRD_WEBHOOK_URL=http://localhost:3000/webhook
 ```
+
+The webhook URL is passed to Relay mode on the command line; it is no longer the primary mode switch via `OPENBIRD_WEBHOOK_URL`.
 
 ## bot.mjs
 
@@ -42,39 +43,29 @@ import FeishuApi from 'openbird/core/api.js';
 const app = express();
 app.use(express.json());
 
-// Initialize OpenBird SDK
 const auth = new FeishuAuth();
 auth.prepareAuth(process.env.OPENBIRD_COOKIE);
 const api = new FeishuApi();
 
-// Bootstrap auth
 const { xCsrfToken } = await api.getCsrfToken(auth);
 const { userId: myUserId } = await api.getUserInfo(auth, xCsrfToken);
 console.log(`Authenticated as ${myUserId}`);
 
-// Track processed events for idempotency
 const processed = new Set();
 
 app.post('/webhook', async (req, res) => {
   const event = req.body;
-  res.status(200).send('ok'); // Always ACK immediately
+  res.status(200).send('ok');
 
-  // Deduplicate
   if (processed.has(event.event_id)) return;
   processed.add(event.event_id);
 
-  // Only handle text messages
   if (event.type !== 'im.message.receive_v1') return;
 
   const { data } = event;
-
-  // Don't reply to own messages
   if (data.sender.id === myUserId) return;
-
-  // Don't reply to bots
   if (data.sender.type === 'bot') return;
 
-  // Send reply
   const chatId = data.conversation.id;
   const text = data.content.text;
   await api.sendMessage(auth, `Echo: ${text}`, chatId);
@@ -90,9 +81,9 @@ Terminal 1 — Start your webhook server:
 node bot.mjs
 ```
 
-Terminal 2 — Start OpenBird (connects WebSocket + forwards events):
+Terminal 2 — Start OpenBird in Relay mode:
 ```bash
-npx openbird
+OPENBIRD_COOKIE="..." npx openbird relay http://localhost:3000/webhook
 ```
 
 ## Key Points

@@ -16,8 +16,10 @@ await api.removeEmojiReaction(auth, messageId, emojiType)
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `messageId` | string | Message ID (e.g. `'7604769001905884091'`) |
+| `messageId` | string | Message ID |
 | `emojiType` | string | Emoji type: `'THUMBSUP'`, `'SMILE'`, `'HEART'`, etc. |
+
+These correspond to current MCP tools `add_reaction` and `remove_reaction`.
 
 ---
 
@@ -47,7 +49,7 @@ await api.putUrgent(auth, chatId, messageId, targetUserId, senderUserId, options
 | `messageId` | string | Message to mark urgent |
 | `targetUserId` | string | Who to notify |
 | `senderUserId` | string | Current user ID (sender) |
-| `options.urgentType` | number? | `1` = APP (default), `2` = SMS, `3` = PHONE |
+| `options.urgentType` | number? | `1` = APP, `2` = SMS, `3` = PHONE |
 
 ### Query Urgent Ack Status
 
@@ -68,7 +70,7 @@ await api.pullUrgentAckStatus(auth, chatId, {
 
 ```javascript
 const result = await api.getBaikeCard(auth, entityId, text, options?)
-// result: { success, info: { term, fullName, definition, detailUrl, contributors } }
+// result: { success, html?, info?, error? }
 ```
 
 | Param | Type | Description |
@@ -79,7 +81,7 @@ const result = await api.getBaikeCard(auth, entityId, text, options?)
 | `options.chatId` | string? | Chat context |
 | `options.messageId` | string? | Message context |
 
-Returns glossary card with definition, full name, contributors, and detail URL.
+Returns glossary card details such as term, full name, definition, detail URL, and contributors when available.
 
 ### Get Baike Recommended Docs
 
@@ -104,10 +106,6 @@ const result = await api.pullTenantsByIds(auth, tenantIds)
 // result: { success, data: { tenants } }
 ```
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `tenantIds` | string[] | Tenant IDs to fetch |
-
 ---
 
 ## System / Config
@@ -118,8 +116,12 @@ const result = await api.pullTenantsByIds(auth, tenantIds)
 const result = await api.getConfig(auth, 'PROFILE_NAME_DISPLAY_TYPE')
 ```
 
+Current MCP tool: `get_config`.
+
 ### Get Feature Flags
 
 ```javascript
 const result = await api.getFeatureFlags(auth, { syncToken? })
 ```
+
+Current MCP tool: `get_feature_flags`.

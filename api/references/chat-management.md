@@ -38,10 +38,14 @@ await api.patchGroupChat(auth, chatId, { name?, description?, iconKey? })
 
 At least one field must be provided.
 
+## Chat Metadata
+
 ```javascript
-await api.patchGroupChat(auth, '7600445044713098206', { name: 'New Name' });
-await api.patchGroupChat(auth, '7600445044713098206', { description: 'Updated' });
+const result = await api.getChatMeta(auth, chatId)
+// result: { success, chat: { lastMessageId, lastMessagePosition, readPosition, ... } }
 ```
+
+Use this when you need chat-level cursors or want a reliable starting point before fetching history. Current MCP tool: `get_chat_meta`.
 
 ## Mark Chat as Read
 
@@ -54,28 +58,34 @@ await api.markChatRead(auth, encryptedChatId, readPosition)
 | `encryptedChatId` | string | Encrypted chat ID (NOT the regular chatId) |
 | `readPosition` | number | Read position timestamp |
 
-```javascript
-await api.markChatRead(auth, 'XISwqtc1G8VCEtA6iEwynw', 1767067184);
-```
-
-**Note**: This uses `encryptedChatId`, not the regular `chatId`. The encrypted form looks like a base64 string (e.g. `'XISwqtc1G8VCEtA6iEwynw'`).
+**Note**: This uses `encryptedChatId`, not the regular `chatId`.
 
 ## Pin / Unpin Session
 
 ```javascript
-await api.pinSession(auth, chatId)    // Stick to top of feed
-await api.unpinSession(auth, chatId)  // Remove from top
+await api.pinSession(auth, chatId)
+await api.unpinSession(auth, chatId)
 ```
+
+These correspond to current MCP tools `pin_session` and `unpin_session`.
+
+## List Chat Pins
+
+```javascript
+const result = await api.pullChatPins(auth, chatId)
+```
+
+Use this to inspect current pinned items / pinned messages for a chat when supported by your current OpenBird version.
 
 ## Mark / Unmark Session
 
 ```javascript
-await api.markSession(auth, userHashId)    // Flag as important
-await api.unmarkSession(auth, userHashId)  // Remove flag
+await api.markSession(auth, userHashId)
+await api.unmarkSession(auth, userHashId)
 ```
 
 | Param | Type | Description |
 |-------|------|-------------|
 | `userHashId` | number | User hash ID (numeric, not string) |
 
-**Note**: These take `userHashId` (a number), not `chatId`.
+**Note**: These take `userHashId`, not `chatId`.

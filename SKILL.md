@@ -1,31 +1,32 @@
 ---
 name: openbird
 description: |
-  OpenBird SDK for Feishu (Lark) IM platform. Load when writing code that
-  uses openbird to send messages, manage chats, handle events, create bots,
-  upload files, or interact with Feishu in any way.
+  OpenBird for Feishu (Lark). Load when writing code that uses OpenBird in
+  MCP mode, Relay mode, or through its low-level FeishuApi / DocxEditor
+  interfaces to send messages, manage chats, receive events, edit documents,
+  manage calendar, or work with webhook bots.
 ---
 
 # OpenBird
 
-OpenBird is a Node.js SDK for the Feishu (Lark) IM platform. It provides two channels:
+OpenBird is a local Feishu (Lark) infrastructure service with two explicit run modes:
 
-- **HTTP API (send)**: All outgoing actions — send messages, manage chats, search users, upload files, manage bots, edit documents, manage calendar — go through `FeishuApi` class methods.
-- **Document Editor**: Stateful `DocxEditor` class for reading and editing Feishu documents (insert blocks, edit text, delete, move, change type).
-- **WebSocket (receive only)**: Server push events (incoming messages, reactions, read state, urgent notifications, calendar sync) are received via WebSocket and forwarded to your webhook URL.
+- **MCP mode**: starts a local MCP server over stdio so AI agents can call OpenBird tools.
+- **Relay mode**: connects to Feishu WebSocket, normalizes incoming events, and POSTs them to your webhook URL.
+- **Low-level library APIs**: `FeishuApi` and `DocxEditor` remain available when you need direct programmatic access.
 
 ## Decision Tree
 
 ```
 What do you need?
 |
-+-- Send messages, manage chats, query users
++-- Let an AI agent call Feishu tools through MCP
 |   -> Load: getting-started + api
 |
-+-- Receive incoming messages / events
++-- Receive incoming messages / events in your own webhook service
 |   -> Load: getting-started + events
 |
-+-- Build a complete bot (send + receive)
++-- Build a complete bot (receive in Relay mode, send via API/MCP)
 |   -> Load: getting-started + api + events + recipes
 |
 +-- Create / manage webhook bots, or send messages via webhook bot URL
@@ -37,7 +38,7 @@ What do you need?
 +-- Schedule messages for future delivery
 |   -> Load: getting-started + api (see references/messaging.md)
 |
-+-- Create / update / delete calendar events, book meeting rooms
++-- Create / update / delete calendar events, book meeting rooms, or generate meeting minutes
 |   -> Load: getting-started + api (see references/calendar.md)
 |
 +-- Read or edit Feishu documents (wiki / docx)
@@ -51,9 +52,9 @@ What do you need?
 
 | Skill | What it covers |
 |-------|---------------|
-| `getting-started` | Install, authenticate, send your first message |
-| `api` | All 75+ HTTP API methods organized by domain |
-| `events` | WebSocket event types and webhook setup |
+| `getting-started` | Install, authenticate, and run OpenBird in MCP or Relay mode |
+| `api` | OpenBird capabilities by domain: messaging, chats, users, bots, media, calendar, documents |
+| `events` | Relay-mode event types and webhook setup |
 | `recipes` | Complete runnable examples for common scenarios |
 | `gotchas` | Known pitfalls and edge cases |
 
@@ -64,5 +65,6 @@ Package:  openbird (npm)
 Runtime:  Node.js >= 20
 Manager:  pnpm
 Auth:     Cookie-based (from Feishu web client)
-Env vars: OPENBIRD_COOKIE (required), OPENBIRD_WEBHOOK_URL (optional)
+Modes:    mcp | relay <webhook-url>
+Env vars: OPENBIRD_COOKIE (required), OPENBIRD_DEBUG (optional), OPENBIRD_ENRICH (optional)
 ```

@@ -1,8 +1,8 @@
 ---
 name: openbird-getting-started
 description: |
-  Getting started with OpenBird SDK. Load when setting up OpenBird for the
-  first time, authenticating, or sending a first message.
+  Getting started with OpenBird. Load when setting up OpenBird for the first
+  time, authenticating, running MCP or Relay mode, or sending a first message.
 ---
 
 # Getting Started with OpenBird
@@ -68,21 +68,27 @@ When sending messages, OpenBird auto-converts Markdown:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `OPENBIRD_COOKIE` | Yes | Cookie string from Feishu web client |
-| `OPENBIRD_WEBHOOK_URL` | No | URL to receive push events via webhook |
+| `OPENBIRD_DEBUG` | No | Set to `true` to enable debug logging |
+| `OPENBIRD_ENRICH` | No | In Relay mode, set to `false` to disable event enrichment |
 
-## Running as a Service
+## Running OpenBird
 
-OpenBird can run as an MCP server (for AI agents) and optionally forward WebSocket events to a webhook:
+OpenBird has two explicit modes:
 
 ```bash
-# MCP-only mode
-OPENBIRD_COOKIE="..." npx openbird
+# MCP mode: start only the MCP server over stdio
+OPENBIRD_COOKIE="..." npx openbird mcp
 
-# MCP + webhook forwarding
-OPENBIRD_COOKIE="..." OPENBIRD_WEBHOOK_URL="http://localhost:3000/webhook" npx openbird
+# Relay mode: connect WebSocket and forward normalized events to your webhook
+OPENBIRD_COOKIE="..." npx openbird relay http://localhost:3000/webhook
 ```
 
+- `mcp` mode does not start webhook forwarding.
+- `relay` mode does not start the MCP server.
+
 ## Using as a Library
+
+When you need lower-level programmatic control, you can call the OpenBird library APIs directly:
 
 ```javascript
 import FeishuAuth from 'openbird/core/auth.js';

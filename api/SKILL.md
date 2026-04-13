@@ -1,15 +1,21 @@
 ---
 name: openbird-api
 description: |
-  OpenBird HTTP API reference. Load when writing code that calls FeishuApi
-  methods — sending messages, managing chats, querying users, uploading
-  files, managing bots, scheduling messages, editing documents, managing
-  calendar events, or any Feishu operation.
+  OpenBird capability reference. Load when writing code that uses OpenBird
+  through FeishuApi, DocxEditor, or equivalent MCP-exposed capabilities for
+  messaging, chats, users, media, bots, calendar, documents, and related
+  Feishu operations.
 ---
 
 # OpenBird API Reference
 
-All outgoing operations use `FeishuApi` class methods. Every method takes `auth` as its first argument.
+OpenBird exposes Feishu capabilities in two closely related forms:
+
+1. **Low-level library APIs** via `FeishuApi`
+2. **Stateful document editing** via `DocxEditor`
+3. **MCP tools** that map to the same capability areas in current OpenBird releases
+
+All low-level outgoing operations use `FeishuApi` class methods. Every method takes `auth` as its first argument.
 
 ```javascript
 import FeishuApi from 'openbird/core/api.js';
@@ -22,30 +28,30 @@ For document editing, use the stateful `DocxEditor` wrapper:
 import DocxEditor from 'openbird/core/docx-editor.js';
 ```
 
-## Method Index
+## Capability Index
 
 ### What do you want to do?
 
 ```
-Send a message (text, file, image, @mention, reply, forward)?
+Send a message (text, file, image, @mention, reply, forward, message link)?
   -> references/messaging.md
 
 Schedule a message for later?
   -> references/messaging.md (Schedule Message section)
 
-Create a group, pin a session, mark read?
+Create a group, pin a session, mark read, or inspect session metadata?
   -> references/chat-management.md
 
 Get chat history or search messages?
   -> references/history-search.md
 
-Look up user info, set signature, manage contacts?
+Look up user info, set signature, inspect relation, or manage contacts?
   -> references/users.md
 
 Add emoji reactions, create threads, send urgent, look up Baike terms?
   -> references/reactions-threads-urgent.md
 
-Create / update / delete calendar events, RSVP, meeting rooms?
+Create / update / delete calendar events, RSVP, create meeting minutes, share events, or find meeting rooms?
   -> references/calendar.md
 
 Upload or download images/files?
@@ -60,11 +66,18 @@ Read or edit Feishu documents (wiki / docx)?
 
 ## Common Patterns
 
-Every API method follows the same pattern:
+Most API methods follow this pattern:
 
 ```javascript
 const result = await api.methodName(auth, ...args);
 // result: { success: boolean, data?: any, error?: string }
 ```
 
-Some older methods return `{ data, status }` instead (sendMessage, sendFileMessage, sendImageMessage, sendMentionMessage, sendReply). These return raw protobuf response buffers.
+Some older messaging methods still return `{ data, status }` instead:
+- `sendMessage`
+- `sendFileMessage`
+- `sendImageMessage`
+- `sendMentionMessage`
+- `sendReply`
+
+These return raw protobuf response buffers.

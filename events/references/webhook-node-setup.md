@@ -1,6 +1,6 @@
 # Webhook Receiver Setup (openbird-webhook-node)
 
-`openbird-webhook-node` is a companion package that provides a ready-made Express server for receiving OpenBird webhook events.
+`openbird-webhook-node` is a companion package that provides a ready-made Node server for receiving OpenBird Relay events.
 
 ## Install
 
@@ -11,48 +11,48 @@ pnpm add openbird-webhook-node
 ## Basic Usage
 
 ```javascript
-import { createWebhookServer } from 'openbird-webhook-node';
+import { createServer } from 'openbird-webhook-node'
 
-const server = createWebhookServer({
+createServer({
   port: 3000,
-  onEvent: async (event) => {
-    console.log('Received event:', event.type);
+  onMessage(event) {
+    console.log('Received event:', event.type)
 
     if (event.type === 'im.message.receive_v1') {
-      const { data } = event;
-      console.log(`Message from ${data.sender.id}: ${data.content.text}`);
+      const { data } = event
+      console.log(`Message from ${data.sender.id}: ${data.content.text}`)
     }
-  }
-});
+  },
+})
 ```
 
-Then point OpenBird to this server:
+Then point OpenBird Relay to this server:
 
 ```bash
-OPENBIRD_WEBHOOK_URL="http://localhost:3000/webhook" npx openbird
+OPENBIRD_COOKIE="..." npx openbird relay http://localhost:3000/webhook
 ```
 
 ## Event Handling Pattern
 
 ```javascript
-const server = createWebhookServer({
+createServer({
   port: 3000,
-  onEvent: async (event) => {
+  onMessage(event) {
     switch (event.type) {
       case 'im.message.receive_v1':
-        await handleMessage(event.data);
-        break;
+        handleMessage(event.data)
+        break
       case 'im.message.reaction_v1':
-        await handleReaction(event.data);
-        break;
+        handleReaction(event.data)
+        break
       case 'im.message.urgent_v1':
-        await handleUrgent(event.data);
-        break;
+        handleUrgent(event.data)
+        break
       default:
-        console.log('Unhandled event:', event.type);
+        console.log('Unhandled event:', event.type)
     }
-  }
-});
+  },
+})
 ```
 
 ## Idempotency
@@ -60,11 +60,11 @@ const server = createWebhookServer({
 The same event may be delivered more than once (retry on failure). Use `event.event_id` to deduplicate:
 
 ```javascript
-const processed = new Set();
+const processed = new Set()
 
-onEvent: async (event) => {
-  if (processed.has(event.event_id)) return;
-  processed.add(event.event_id);
+function onMessage(event) {
+  if (processed.has(event.event_id)) return
+  processed.add(event.event_id)
   // handle event...
 }
 ```

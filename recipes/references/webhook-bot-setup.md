@@ -12,13 +12,11 @@ const auth = new FeishuAuth();
 auth.prepareAuth(process.env.OPENBIRD_COOKIE);
 const api = new FeishuApi();
 
-// Bootstrap
 const { xCsrfToken } = await api.getCsrfToken(auth);
 await api.getUserInfo(auth, xCsrfToken);
 
 const chatId = '7599271773103737795';
 
-// 1. Create the webhook bot
 const createResult = await api.createWebhookBot(
   auth,
   chatId,
@@ -34,25 +32,21 @@ if (!createResult.success) {
 const botId = createResult.data.bot_id;
 console.log('Bot created:', botId);
 
-// 2. Get the webhook URL
 const infoResult = await api.getWebhookBotInfo(auth, botId);
 const webhookUrl = infoResult.data.webhook;
 console.log('Webhook URL:', webhookUrl);
 
-// 3. Get signature key (for webhook verification)
 const sigResult = await api.getSignature(auth, botId);
 console.log('Signature:', sigResult.data);
 ```
 
 ## Sending Messages via Webhook Bot
 
-Once you have the webhook URL, use the built-in send methods (no `auth` needed):
+Once you have the webhook URL, use the built-in send methods (no `auth` needed). These correspond to current MCP tools `send_webhook_bot_text`, `send_webhook_bot_post`, `send_webhook_bot_image`, `send_webhook_bot_share_chat`, `send_webhook_bot_card`, and `send_webhook_bot_message`.
 
 ```javascript
-// Send a text message
 await api.sendWebhookBotText(webhookUrl, 'Build #42 passed!');
 
-// Send an interactive card
 await api.sendWebhookBotCard(webhookUrl, {
   header: { title: { tag: 'plain_text', content: 'Build Result' } },
   elements: [
@@ -60,7 +54,6 @@ await api.sendWebhookBotCard(webhookUrl, {
   ]
 });
 
-// Send with webhook signature verification
 const sigResult = await api.getSignature(auth, botId);
 const secret = sigResult.data.signature;
 await api.sendWebhookBotText(webhookUrl, 'Signed message', { secret });
@@ -69,15 +62,11 @@ await api.sendWebhookBotText(webhookUrl, 'Signed message', { secret });
 ## Managing the Bot
 
 ```javascript
-// Update bot name/description
 await api.updateWebhookBot(auth, botId, {
   name: 'Deploy Notifier',
   description: 'Updated description'
 });
 
-// Delete bot from chat
 await api.deleteBot(auth, chatId, botId);
-
-// Add existing bot to another chat
 await api.addBotToChat(auth, anotherChatId, botId);
 ```

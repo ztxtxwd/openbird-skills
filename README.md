@@ -1,8 +1,8 @@
 # openbird-skills
 
-Agent Skills for [OpenBird](https://github.com/ztxtxwd/openbird) — a Node.js SDK for the Feishu (Lark) IM platform.
+Agent Skills for [OpenBird](https://github.com/ztxtxwd/openbird) — a local Feishu (Lark) infrastructure service that runs in either MCP mode or Relay mode.
 
-These skills teach AI coding agents how to write correct OpenBird code. They follow the [Agent Skills](https://agentskills.io/specification) open standard.
+These skills teach AI coding agents how to use current OpenBird commands, MCP tools, and low-level library APIs correctly. They follow the [Agent Skills](https://agentskills.io/specification) open standard.
 
 ## Install
 
@@ -14,33 +14,33 @@ npx skills add https://github.com/ztxtxwd/openbird-skills
 
 | Skill | Description |
 |-------|-------------|
-| `getting-started` | Install, authenticate, send your first message |
-| `api` | All 75+ HTTP API methods (messaging, chats, users, bots, media, calendar, documents) |
-| `events` | WebSocket push event types and webhook receiver setup |
-| `recipes` | Complete runnable examples (auto-reply bot, scheduled messages, webhook bot) |
+| `getting-started` | Install, authenticate, run OpenBird in MCP or Relay mode, and send your first message |
+| `api` | Messaging, chats, users, bots, media, calendar, documents, meeting rooms, and related low-level APIs |
+| `events` | Relay-mode event delivery, webhook receiver setup, and event payload reference |
+| `recipes` | Runnable examples for common OpenBird workflows |
 | `gotchas` | Known pitfalls and edge cases |
 
 ## Structure
 
 ```
 SKILL.md                              <- Router (loads first)
-getting-started/SKILL.md              <- Quick start
+getting-started/SKILL.md              <- Quick start, modes, auth
 api/
-  SKILL.md                            <- API method index
+  SKILL.md                            <- Capability index
   references/
-    messaging.md                      <- Send text/file/image, @mention, reply, forward, schedule
-    chat-management.md                <- Create group, pin, mark read
+    messaging.md                      <- Send, reply, forward, schedule, message links
+    chat-management.md                <- Create group, pin, mark read, session metadata
     history-search.md                 <- Chat history, search
-    users.md                          <- User info, presence, contacts
+    users.md                          <- User info, profile, relation, contacts
     reactions-threads-urgent.md       <- Reactions, threads, urgent, Baike, config
-    calendar.md                       <- Calendar CRUD, meeting rooms, busy status
+    calendar.md                       <- Calendar, RSVP, minutes, sharing, meeting rooms
     media.md                          <- Upload/download images and files
-    webhook-bots.md                   <- Webhook bot CRUD
+    webhook-bots.md                   <- Webhook bot CRUD and send methods
     documents.md                      <- Read/edit Feishu documents (wiki/docx)
 events/
-  SKILL.md                            <- Event receiving overview
+  SKILL.md                            <- Relay event receiving overview
   references/
-    event-types.md                    <- All 15+ event payload structures
+    event-types.md                    <- Event payload structures and special cases
     webhook-node-setup.md             <- openbird-webhook-node setup
 recipes/
   SKILL.md                            <- Recipe index

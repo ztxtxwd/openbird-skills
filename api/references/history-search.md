@@ -7,7 +7,7 @@ const result = await api.getChatMeta(auth, chatId)
 // result: { success, chat: { lastMessageId, lastMessagePosition, readPosition } }
 ```
 
-Returns metadata about a chat — useful to know where to start fetching history.
+Returns metadata about a chat — useful to know where to start fetching history. Current MCP tools in this area are `get_chat_meta`, `get_chat_history`, and `search_in_chat`.
 
 ## Get Chat History
 
