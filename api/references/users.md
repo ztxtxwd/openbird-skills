@@ -17,7 +17,7 @@ Returns:
 | `userType` | number | `1` = user, `2` = bot |
 | `avatarKey` | string | Avatar image key |
 
-Works for both regular users and bots. This is the recommended method for looking up users. Current MCP tools in this area include `get_user_info`, `get_user_profile_card`, `set_user_signature`, and `get_user_relation`.
+Works for both regular users and bots. This is the recommended method for looking up users. Current MCP tools in this area include `get_user_info`, `get_user_by_id`, `get_user_profile_card`, `set_user_signature`, `get_user_presence`, `get_user_relation`, `save_contact_alias`, and `sync_contact_info`.
 
 ## Get User Profile Card
 
@@ -28,6 +28,8 @@ const result = await api.getUserProfileCard(auth, userId)
 Returns profile card data such as signature/description, display name, avatar key, and profile field policies.
 
 **Note**: `userId` must be a 15-20 digit numeric string.
+
+Current MCP tool: `get_user_profile_card`.
 
 ## Set User Signature
 
@@ -49,6 +51,8 @@ const result = await api.getUserPresence(auth, userId)
 ```
 
 Returns online/presence status for a user.
+
+Current MCP tool: `get_user_presence`.
 
 ## Get User Relation
 
@@ -76,6 +80,8 @@ await api.saveContactAlias(auth, userId, { alias?, memo?, memoImageKey? })
 | `memo` | string? | Memo/note text |
 | `memoImageKey` | string? | Image key for memo |
 
+Current MCP tool: `save_contact_alias`.
+
 ## Sync Contact Info
 
 ```javascript
@@ -84,10 +90,12 @@ await api.syncContactInfo(auth, userId)
 
 Call after `saveContactAlias()` to sync updated contact data.
 
+Current MCP tool: `sync_contact_info`.
+
 ## Deprecated User Lookup
 
 ```javascript
 const result = await api.getUserById(auth, userId)
 ```
 
-Deprecated — prefer `getUserInfoById()` because it works for both regular users and bots.
+Deprecated for library callers — prefer `getUserInfoById()` because it works for both regular users and bots. Current MCP still exposes this older shape as `get_user_by_id` when you specifically need it.

@@ -3,8 +3,8 @@ name: openbird-api
 description: |
   OpenBird capability reference. Load when writing code that uses OpenBird
   through FeishuApi, DocxEditor, or equivalent MCP-exposed capabilities for
-  messaging, chats, users, media, bots, calendar, documents, and related
-  Feishu operations.
+  messaging, chats, groups, users, contacts, media, bots, calendar,
+  documents, and related Feishu operations.
 ---
 
 # OpenBird API Reference
@@ -39,13 +39,13 @@ Send a message (text, file, image, @mention, reply, forward, message link)?
 Schedule a message for later?
   -> references/messaging.md (Schedule Message section)
 
-Create a group, pin a session, mark read, or inspect session metadata?
+Create or update a group, inspect pinned messages, mark read, or inspect session metadata?
   -> references/chat-management.md
 
-Get chat history or search messages?
+Get chat or thread history, search messages, or materialize local attachment paths?
   -> references/history-search.md
 
-Look up user info, set signature, inspect relation, or manage contacts?
+Look up user info, set signature, inspect relation/presence, or manage contacts?
   -> references/users.md
 
 Add emoji reactions, create threads, send urgent, look up Baike terms?
@@ -54,7 +54,7 @@ Add emoji reactions, create threads, send urgent, look up Baike terms?
 Create / update / delete calendar events, RSVP, create meeting minutes, share events, or find meeting rooms?
   -> references/calendar.md
 
-Upload or download images/files?
+Upload images/files or download message attachments to local temp files?
   -> references/media.md
 
 Create or manage webhook bots, or send messages via webhook bot URL?

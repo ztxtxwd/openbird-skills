@@ -11,7 +11,7 @@ The most important event type. Fired when a new message is received in any chat.
   "timestamp": 1739347200000,
   "data": {
     "id": "7604769001905884091",
-    "conversation": {
+    "chat": {
       "id": "7599271773103737795",
       "type": "group"
     },
@@ -28,7 +28,9 @@ The most important event type. Fired when a new message is received in any chat.
 }
 ```
 
-### Conversation types
+Current normalized webhook payloads use `data.chat`, not `data.conversation`.
+
+### Chat types
 
 | Value | Meaning |
 |-------|---------|
@@ -103,12 +105,14 @@ Current OpenBird behavior has one notable special case: `im.thread.reply_count_v
     "chatId": "chat_1",
     "threadId": "thread_1",
     "replyCount": 12,
-    "updateTime": 1712023530000
+    "updateTime": "1712023530000"
   }
 }
 ```
 
 Do **not** assume other event types also include `semantic` — in current OpenBird, this is the exception, not the rule.
+
+Large numeric fields may be stringified in webhook JSON because OpenBird normalizes BigInts before delivery.
 
 ## im.message.urgent_v1 (Urgent)
 

@@ -66,7 +66,7 @@ app.post('/webhook', async (req, res) => {
   if (data.sender.id === myUserId) return;
   if (data.sender.type === 'bot') return;
 
-  const chatId = data.conversation.id;
+  const chatId = data.chat.id;
   const text = data.content.text;
   await api.sendMessage(auth, `Echo: ${text}`, chatId);
 });
@@ -92,3 +92,4 @@ OPENBIRD_COOKIE="..." npx openbird relay http://localhost:3000/webhook
 2. **Deduplicate by event_id** — same event may arrive more than once
 3. **Skip own messages** — compare `data.sender.id` against your `myUserId`
 4. **Skip bot messages** — check `data.sender.type !== 'bot'` to avoid loops
+5. **Current message payloads use `data.chat.id`** — not `data.conversation.id`

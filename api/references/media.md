@@ -74,6 +74,40 @@ if (result.success) {
 
 For encrypted images (from chat history), call `getChatHistory()` first — it auto-caches decryption keys. Subsequent `downloadImage()` calls will decrypt transparently.
 
+Current MCP tool: `download_image`. MCP returns image content inline, not a filesystem path.
+
+## Download File to Local Temp Path
+
+```javascript
+const result = await api.downloadFile(auth, messageId, fileKey, {
+  chatId,
+  scene: 'chat'
+})
+// result: { success, fileName?, mimeType?, size?, path?, ... }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `messageId` | string | Message ID containing the file |
+| `fileKey` | string | File key from the message |
+| `options.chatId` | string | Chat ID where the file message lives |
+| `options.scene` | string? | Download scene (default: `'chat'`) |
+
+Current OpenBird writes the downloaded attachment to a local temp directory and returns an absolute `path`.
+
+Current MCP tool: `download_file`.
+
+MCP input parameters:
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `message_id` | string | Message ID containing the file |
+| `file_key` | string | File key from the message content |
+| `chat_id` | string | Chat ID where the file message belongs |
+| `scene` | string? | Download scene (default: `'chat'`) |
+
+Current MCP behavior saves files under `/tmp/openbird-downloads` and returns JSON metadata including the local `path`.
+
 ## Complete Upload-Send Flow
 
 ```javascript

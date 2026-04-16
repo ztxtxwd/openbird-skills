@@ -48,6 +48,10 @@ Every event is a JSON object with this structure:
 | `timestamp` | number | Milliseconds since epoch |
 | `data` | object | Event payload (varies by type) |
 
+For message events, current normalized payloads use `data.chat`, not `data.conversation`.
+
+Large numeric protocol values may appear as strings in webhook JSON because OpenBird normalizes BigInt-like values to JSON-safe forms before delivery.
+
 ## Event Type Quick Reference
 
 | Type | Description |

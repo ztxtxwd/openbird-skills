@@ -80,6 +80,14 @@ In `sendMentionMessage()`, the mention display name must exactly match the `@dis
 
 Scheduled message APIs use milliseconds.
 
+### `download_file` writes to a local temp path
+
+Current MCP `download_file` saves the attachment under `/tmp/openbird-downloads` and returns metadata including an absolute local `path`.
+
+### History/thread MCP tools can materialize local media
+
+`get_chat_history` and `get_thread_messages` accept `download_media`. When enabled, OpenBird may add `localImages`, `localFiles`, and local `image_path` content parts to the result.
+
 ---
 
 ## Calendar
@@ -119,6 +127,14 @@ Current MCP document helpers accept `/wiki/` and `/docx/` URLs, but wiki objects
 ---
 
 ## Events
+
+### Message webhook payloads use `data.chat`, not `data.conversation`
+
+Current normalized message events place chat metadata under `data.chat`.
+
+### Large webhook IDs may be strings
+
+OpenBird normalizes BigInt-like values before JSON delivery, so some large numeric fields may appear as strings.
 
 ### Always ACK webhook immediately
 

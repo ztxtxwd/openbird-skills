@@ -15,6 +15,10 @@ OpenBird is a local Feishu (Lark) infrastructure service with two explicit run m
 - **Relay mode**: connects to Feishu WebSocket, normalizes incoming events, and POSTs them to your webhook URL.
 - **Low-level library APIs**: `FeishuApi` and `DocxEditor` remain available when you need direct programmatic access.
 
+## Baseline
+
+Current docs are aligned against OpenBird `v3.2.5` (`f38cf350ee0834a5c65d9d9ad5893139d8892fda`).
+
 ## Decision Tree
 
 ```
@@ -29,10 +33,16 @@ What do you need?
 +-- Build a complete bot (receive in Relay mode, send via API/MCP)
 |   -> Load: getting-started + api + events + recipes
 |
++-- Manage chats or groups, inspect pins, or sync contact aliases
+|   -> Load: getting-started + api (see references/chat-management.md and references/users.md)
+|
++-- Read chat or thread history, optionally materialize local media files
+|   -> Load: getting-started + api (see references/history-search.md)
+|
 +-- Create / manage webhook bots, or send messages via webhook bot URL
 |   -> Load: getting-started + api (see references/webhook-bots.md)
 |
-+-- Upload images or files
++-- Upload images/files or download message attachments to a local temp path
 |   -> Load: getting-started + api (see references/media.md)
 |
 +-- Schedule messages for future delivery
@@ -53,7 +63,7 @@ What do you need?
 | Skill | What it covers |
 |-------|---------------|
 | `getting-started` | Install, authenticate, and run OpenBird in MCP or Relay mode |
-| `api` | OpenBird capabilities by domain: messaging, chats, users, bots, media, calendar, documents |
+| `api` | OpenBird capabilities by domain: messaging, groups/chats, users/contacts, media, calendar, documents, webhook bots |
 | `events` | Relay-mode event types and webhook setup |
 | `recipes` | Complete runnable examples for common scenarios |
 | `gotchas` | Known pitfalls and edge cases |
